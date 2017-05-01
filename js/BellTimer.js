@@ -31,7 +31,7 @@ var self;
   };
   BellTimer.prototype.reloadData = function(callback) {
     $.ajax({
-      url: '/api/data?v=' + Date.now(),
+      url: 'api/data?v=' + Date.now(),
       type: 'GET'
     }).done(function(data) {
       data = JSON.parse(data);
@@ -260,7 +260,7 @@ var self;
   BellTimer.prototype.synchronize = function(n, callback) {
     var getTimeCorrection = function(callback) {
       var sentTime = Date.now();
-      $.get('/api/time', function(data) {
+      $.get('api/time', function(data) {
         var serverTime = data.time;
         var currentTime = Date.now();
 
