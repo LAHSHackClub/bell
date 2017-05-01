@@ -91,8 +91,7 @@ $(window).on('load', function() {
     // Start intervals
     //async.asyncify(),
 
-    // Report analytics
-    analyticsManager.reportAnalytics
+
 
   ], function(err) {
 
@@ -102,6 +101,5 @@ $(window).on('load', function() {
     // var adjustment = Math.round(bellTimer.getCorrection() / 1000);
     // var adjustmentString = adjustment + ' ' + ((adjustment == 1) ? 'second' : 'seconds');
     // uiManager.showAlert('Adjusted ' + adjustmentString + ' to match school time');
-
   });
 });

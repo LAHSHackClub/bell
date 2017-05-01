@@ -31,7 +31,7 @@ var self;
   };
   BellTimer.prototype.reloadData = function(callback) {
     $.ajax({
-      url: 'api/data?v=' + Date.now(),
+      url: 'api/data' + Date.now(),
       type: 'GET'
     }).done(function(data) {
       data = JSON.parse(data);

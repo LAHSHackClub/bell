@@ -201,7 +201,7 @@ const $ = require('jquery');
       return callback();
 
     var setUuid = function(callback) {
-      $.get('/api/uuid', function(uuid) {
+      $.get('api/uuid', function(uuid) {
         var uuid = uuid.id;
         self.cookieManager.set('id', uuid);
         callback();
@@ -226,7 +226,7 @@ const $ = require('jquery');
     var report = function(callback) {
       $.ajax({
         type: 'POST',
-        url: '/api/analytics',
+        url: 'api/analytics',
         data: {
           id: self.cookieManager.get('id'),
           newPageLoad: newPageLoad,
@@ -246,6 +246,7 @@ const $ = require('jquery');
             callback();
         },
         error: function(err) {
+          self.logger.warn('Analytics are disabled');
           callback();
         }
       })
@@ -293,7 +294,7 @@ var self;
   };
   BellTimer.prototype.reloadData = function(callback) {
     $.ajax({
-      url: 'api/data?v=' + Date.now(),
+      url: 'api/data' + Date.now(),
       type: 'GET'
     }).done(function(data) {
       data = JSON.parse(data);
@@ -1300,8 +1301,7 @@ $(window).on('load', function() {
     // Start intervals
     //async.asyncify(),
 
-    // Report analytics
-    analyticsManager.reportAnalytics
+
 
   ], function(err) {
 
@@ -1311,7 +1311,6 @@ $(window).on('load', function() {
     // var adjustment = Math.round(bellTimer.getCorrection() / 1000);
     // var adjustmentString = adjustment + ' ' + ((adjustment == 1) ? 'second' : 'seconds');
     // uiManager.showAlert('Adjusted ' + adjustmentString + ' to match school time');
-
   });
 });
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})

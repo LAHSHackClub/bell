@@ -18,7 +18,7 @@ const $ = require('jquery');
       return callback();
 
     var setUuid = function(callback) {
-      $.get('/api/uuid', function(uuid) {
+      $.get('api/uuid', function(uuid) {
         var uuid = uuid.id;
         self.cookieManager.set('id', uuid);
         callback();
@@ -43,7 +43,7 @@ const $ = require('jquery');
     var report = function(callback) {
       $.ajax({
         type: 'POST',
-        url: '/api/analytics',
+        url: 'api/analytics',
         data: {
           id: self.cookieManager.get('id'),
           newPageLoad: newPageLoad,
@@ -63,6 +63,7 @@ const $ = require('jquery');
             callback();
         },
         error: function(err) {
+          self.logger.warn('Analytics are disabled');
           callback();
         }
       })
