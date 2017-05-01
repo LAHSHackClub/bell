@@ -61,6 +61,9 @@ const $ = require('jquery');
 
           if (callback)
             callback();
+        },
+        error: function(err) {
+          callback();
         }
       })
     };
