@@ -293,6 +293,7 @@ var self;
       url: '/api/data?v=' + Date.now(),
       type: 'GET'
     }).done(function(data) {
+      data = JSON.parse(data);
       var rawSchedules = data.schedules;
       for (var key in rawSchedules) {
         var schedule = rawSchedules[key];
