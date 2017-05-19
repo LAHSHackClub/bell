@@ -7,6 +7,103 @@ body {
 	// overflow-x: hidden;
 }
 
+.results a:link, a:visited {
+	text-decoration: none;
+}
+
+.result {
+	margin: 10px auto;
+	background-color: white;
+	padding: 10px;
+	width: 50%;
+	border: 1px white solid;
+	cursor: pointer;
+	transition: border 0.5s ease;
+}
+
+.result:hover {
+	border: 1px #aaa solid;
+}
+
+.result h3 {
+	color: black;
+	padding: 0;
+	margin: 0;
+	font-weight: 400;
+	font-size: 20px;
+}
+
+.result h3 a:link, a:visited {
+	color: black;
+	text-decoration: none;
+}
+.result h3 a:hover {
+	text-decoration: underline;
+}
+
+.result .smaller {
+	color: #aaaaaa;
+}
+.result .smaller .blue {
+	color: darkturquoise;
+}
+.result table {
+	width: 100%;
+	color: #aaaaaa;
+}
+.result table td {
+	padding: 0;
+	margin: 0;
+}
+.user {
+	width: 90%;
+}
+.rating {
+	width: 10%;
+	text-align: right;
+}
+
+.header {
+	top: 0px;
+	height: 50px;
+	transition: background-color 1s ease;
+	text-align: center;
+}
+
+.searchHeader {
+	border: 0px black solid;
+	border-bottom: 1px black solid;
+	font-size: 20px;
+	padding: 10px;
+	padding-bottom: 3px;
+	background-color: transparent;
+	width: 50vw;
+	text-align: center;
+}
+
+.searchBig {
+	border: 0px black solid;
+	border-bottom: 1px black solid;
+	font-size: 50px;
+	text-align: center;
+	padding: 10px;
+	padding-bottom: 3px;
+	background-color: transparent;
+}
+
+.searchSubtitle {
+	margin: 10px;
+	text-align: center;
+}
+
+.searchSubtitle a:link, a:visited {
+	color: black;
+	text-decoration: none;
+}
+.searchSubtitle a:hover {
+	text-decoration: underline;
+}
+
 #circle {
 	opacity: 0.1;
 }

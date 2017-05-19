@@ -1,0 +1,40 @@
+doctype html
+html
+  head
+    title Bell Countdown
+    link(rel="shortcut icon", type="image/png", href="/favicons/empty.png")#favicon
+    link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto")
+    link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=" + version)
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+  body
+    .container#page1
+      .header#header
+        input.searchHeader#search(type="text", placeholder="Enter School Name", value=query)
+      .results
+        for result in results
+          .result(href="/#" + result.link)
+            h3 #{result.school}
+              span.smaller #
+                span.blue #{result.link}
+            table
+              tr
+                td.user=result.user
+                td.rating #{result.rating}%
+    script.
+      $('#page1').css('background-color', '#e6e6e6');
+      var colors = ['pink', 'orange', 'yellow', 'lime', 'cyan', 'magenta'];
+      var i = Math.floor(Math.random() * colors.length);
+      $('#header').css('background-color', colors[i]);
+      setInterval(function() {
+      if (++i == colors.length)
+        i = 0;
+      $('#header').css('background-color', colors[i]);
+      }, 2000);
+      $('#search').on('keypress', function(e) {
+      if (e.keyCode == 13)
+        window.location = '/search?q=' + $('#search').val();
+      });
+      $('.result').click(function(e) {
+      window.location = $(this).attr('href');
+      });

@@ -59,6 +59,30 @@ var startWebServer = function(callback) {
       server_name: config['server name']
     });
   });
+  app.get('/chooser', (req, res) => {
+    res.render('chooser');
+  });
+  app.get('/search', (req, res) => {
+    res.render('search', {
+      query: req.query.q,
+      results: [{
+        school: 'Los Altos High School',
+        user: 'user1',
+        rating: 99,
+        link: 'lahs'
+      }, {
+        school: 'Mountain View High School',
+        user: 'user2',
+        rating: 99,
+        link: 'mvhs'
+      }, {
+        school: 'Gunn High School',
+        user: 'user3',
+        rating: 99,
+        link: 'gunn'
+      }]
+    });
+  });
 
   //if (config['enable redis'])
   app.get('/stats', (req, res) => {

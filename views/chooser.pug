@@ -1,0 +1,28 @@
+doctype html
+html
+  head
+    title Bell Countdown
+    link(rel="shortcut icon", type="image/png", href="/favicons/empty.png")#favicon
+    link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto")
+    link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=" + version)
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+  body
+    .container#page1
+      .centered
+        input.searchBig#search(type="text", placeholder="Enter School Name", autofocus)
+        .searchSubtitle 
+          a(href="#") or create your own schedule
+    script.
+      var colors = ['pink', 'orange', 'yellow', 'lime', 'cyan', 'magenta'];
+      var i = Math.floor(Math.random() * colors.length);
+      $('#page1').css('background-color', colors[i]);
+      setInterval(function() {
+      if (++i == colors.length)
+        i = 0;
+      $('#page1').css('background-color', colors[i]);
+      }, 2000);
+      $('#search').on('keypress', function(e) {
+      if (e.keyCode == 13)
+        window.location = '/search?q=' + $('#search').val();
+      });
