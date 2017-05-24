@@ -30,21 +30,26 @@ var intervals = {
   },
   oneSecond: {
     start: function(func, callback) {
-      setTimeout(function() {
+      // setTimeout(function() {
+      func();
+      callback(setInterval(function() {
         func();
-        callback(setInterval(function() {
-          func();
 
-          // This function should be called every second, on the second.
-          // Detect if it is more than 100 ms off, and if so, restart interval.
-          var waitUntilNextTick = bellTimer.getWaitUntilNextTick();
-          var offset = Math.min(waitUntilNextTick, 1000 - waitUntilNextTick);
-          if (offset > 100 && (Visibility.state() == 'visible')) {
-            logger.debug('Tick offset was ' + offset + ' ms, restarting interval...');
-            intervalManager.restart('oneSecond');
-          }
-        }, 1000));
-      }, 1000 - bellTimer.getWaitUntilNextTick());
+        // This function should be called every second, on the second.
+        // Detect if it is more than 100 ms off, and if so, restart interval.
+        // var waitUntilNextTick = bellTimer.getWaitUntilNextTick();
+        // var offset = Math.min(waitUntilNextTick, 1000 - waitUntilNextTick);
+        // if (offset > 100 && (Visibility.state() == 'visible')) {
+        //   logger.debug('Tick offset was ' + offset + ' ms, restarting interval...');
+        //   intervalManager.restart('oneSecond');
+        // }
+
+        // var waitUntilNextTick = bellTimer.getWaitUntilNextTick();
+        // if (waitUntilNextTick < 100 && (Visibility.state() == 'visible')) {
+        //   func();
+        // }
+      }, 1000 / 30));
+      // }, 1000 - bellTimer.getWaitUntilNextTick());
     },
     func: uiManager.update
   },
@@ -68,7 +73,10 @@ bellTimer.setDebugLogFunction(logger.debug);
 global.bellTimer = bellTimer;
 global.logger = logger;
 global.cookieManager = cookieManager;
+global.uiManager = uiManager;
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
+
+bellTimer.enableDevMode(new Date('2017-10-29 23:50'), 60);
 
 $(window).on('load', function() {
   async.series([
@@ -89,7 +97,7 @@ $(window).on('load', function() {
     async.asyncify(_.partial(logger.success, 'UI initialized and updated')),
 
     // Start intervals
-    //async.asyncify(),
+    // async.asyncify(),
 
   ], function(err) {
 

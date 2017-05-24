@@ -1,0 +1,36 @@
+{
+  "weekend": {
+    "name": "Weekend",
+    "color": "cyan",
+    "periods": {}
+  },
+  "holiday": {
+    "name": "Holiday",
+    "color": "magenta",
+    "periods": {}
+  },
+  "normal": {
+    "name": "Normal Schedule",
+    "periods": {
+      "7:10": ["Passing to ", 0],
+      "7:15": [0],
+      "8:05": ["Passing to ", 1],
+      "8:10": [1],
+      "9:00": ["Passing to ", 2],
+      "9:05": [2],
+      "10:00": ["Brunch"],
+      "10:10": ["Passing to ", 3],
+      "10:15": [3],
+      "11:05": ["Passing to ", 4],
+      "11:10": [4],
+      "12:00": ["Lunch"],
+      "12:45": ["Passing to ", 5],
+      "12:50": [5],
+      "13:40": ["Passing to ", 6],
+      "13:45": [6],
+      "14:35": ["Passing to ", 7],
+      "14:40": [7],
+      "15:30": ["After School"]
+    }
+  }
+}

@@ -14,14 +14,14 @@ html
         .searchSubtitle 
           a(href="#") or create your own schedule
     script.
-      var colors = ['pink', 'orange', 'yellow', 'lime', 'cyan', 'magenta'];
-      var i = Math.floor(Math.random() * colors.length);
-      $('#page1').css('background-color', colors[i]);
-      setInterval(function() {
-      if (++i == colors.length)
-        i = 0;
-      $('#page1').css('background-color', colors[i]);
-      }, 2000);
+      //- var colors = ['pink', 'orange', 'yellow', 'lime', 'cyan', 'magenta'];
+      //- var i = Math.floor(Math.random() * colors.length);
+      //- $('#page1').css('background-color', colors[i]);
+      //- setInterval(function() {
+      //- if (++i == colors.length)
+      //-   i = 0;
+      //- $('#page1').css('background-color', colors[i]);
+      //- }, 2000);
       $('#search').on('keypress', function(e) {
       if (e.keyCode == 13)
         window.location = '/search?q=' + $('#search').val();

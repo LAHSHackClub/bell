@@ -4,7 +4,7 @@ const http = require('http');
 const express = require('express');
 const app = express();
 const server = http.createServer(app);
-const fs = require('fs');
+const fs = require('fs-extra');
 const shortid = require('shortid');
 const async = require('async');
 const redis = require('redis');
@@ -14,6 +14,39 @@ const crypto = require('crypto');
 var client; // redis client
 const timesyncServer = require('timesync/server');
 
+var schools = [{
+  name: 'Los Altos High School',
+  user: 'user1',
+  rating: 99,
+  link: 'lahs'
+}, {
+  name: 'Mountain View High School',
+  user: 'user2',
+  rating: 99,
+  link: 'mvhs'
+}, {
+  name: 'Gunn High School',
+  user: 'user3',
+  rating: 99,
+  link: 'gunn'
+}];
+var searchSchools = function(query) {
+  query = query.toLowerCase();
+  var results = [];
+  for (var i = 0; i < schools.length; i++) {
+    var schoolString = schools[i].name + ' #' + schools[i].link + ' ' + schools[i].user;
+    schoolString = schoolString.toLowerCase();
+    if (schoolString.indexOf(query) > -1)
+      results.push(schools[i]);
+  }
+  return results;
+};
+var lookupSchoolByLink = function(link) {
+  for (var i = 0; i < schools.length; i++)
+    if (schools[i].link == link)
+      return schools[i];
+  return null;
+};
 var connectToRedis = function(callback) {
   if (!config['enable redis']) {
     logger.warn('Redis disabled');
@@ -43,14 +76,27 @@ var startWebServer = function(callback) {
     currentVersion = hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex');
     return currentVersion;
   };
-  var getCorrection = function() {
-    return _.parseInt(fs.readFileSync('data/correction.txt').toString());
+
+  var ensureDirectory = function(link) {
+    fs.ensureDirSync(`data/${link}`);
+    if (!fs.existsSync(`data/${link}/correction.txt`))
+      fs.copySync('data_default/correction.txt', `data/${link}/correction.txt`);
+    if (!fs.existsSync(`data/${link}/schedules.json`))
+      fs.copySync('data_default/schedules.json', `data/${link}/schedules.json`);
+    if (!fs.existsSync(`data/${link}/calendar.json`))
+      fs.copySync('data_default/calendar.json', `data/${link}/calendar.json`);
   };
-  var getSchedules = function() {
-    return fs.readFileSync('data/schedules.txt').toString();
+  var getCorrection = function(link) {
+    ensureDirectory(link);
+    return _.parseInt(fs.readFileSync(`data/${link}/correction.txt`).toString());
   };
-  var getCalendar = function() {
-    return fs.readFileSync('data/calendar.txt').toString();
+  var getSchedules = function(link) {
+    ensureDirectory(link);
+    return JSON.parse(fs.readFileSync(`data/${link}/schedules.json`).toString());
+  };
+  var getCalendar = function(link) {
+    ensureDirectory(link);
+    return JSON.parse(fs.readFileSync(`data/${link}/calendar.json`).toString());
   };
 
   app.get('/', (req, res) => {
@@ -65,22 +111,7 @@ var startWebServer = function(callback) {
   app.get('/search', (req, res) => {
     res.render('search', {
       query: req.query.q,
-      results: [{
-        school: 'Los Altos High School',
-        user: 'user1',
-        rating: 99,
-        link: 'lahs'
-      }, {
-        school: 'Mountain View High School',
-        user: 'user2',
-        rating: 99,
-        link: 'mvhs'
-      }, {
-        school: 'Gunn High School',
-        user: 'user3',
-        rating: 99,
-        link: 'gunn'
-      }]
+      results: searchSchools(req.query.q)
     });
   });
 
@@ -141,15 +172,13 @@ var startWebServer = function(callback) {
     });
   app.get('/api/correction', (req, res) => {
     res.set('Content-Type', 'text/plain');
-    res.send(getCorrection().toString());
+    res.send(getCorrection(req.query.s).toString());
   });
   app.get('/api/calendar', (req, res) => {
-    res.set('Content-Type', 'text/plain');
-    res.send(getCalendar());
+    res.json(getCalendar(req.query.s));
   });
   app.get('/api/schedules', (req, res) => {
-    res.set('Content-Type', 'text/plain');
-    res.send(getSchedules());
+    res.json(getSchedules(req.query.s));
   });
   app.get('/api/version', (req, res) => {
     res.set('Content-Type', 'text/plain');
@@ -165,6 +194,9 @@ var startWebServer = function(callback) {
     res.json({
       time: Date.now()
     });
+  });
+  app.get('/api/school/:link', (req, res) => {
+    res.json(lookupSchoolByLink(req.params.link));
   });
 
   var bodyParser = require('body-parser')

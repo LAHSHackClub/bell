@@ -7,6 +7,20 @@ body {
 	// overflow-x: hidden;
 }
 
+.school {
+	margin: 10px;
+	padding: 10px;
+}
+.school a:link, a:visited {
+	transition: opacity 1s ease;
+	opacity: 0.2;
+	font-weight: 600;
+	text-decoration: none;
+}
+.school a:hover {
+	opacity: 1;
+}
+
 .results a:link, a:visited {
 	text-decoration: none;
 }
@@ -79,6 +93,7 @@ body {
 	background-color: transparent;
 	width: 50vw;
 	text-align: center;
+	outline: none;
 }
 
 .searchBig {
@@ -89,6 +104,7 @@ body {
 	padding: 10px;
 	padding-bottom: 3px;
 	background-color: transparent;
+	outline: none;
 }
 
 .searchSubtitle {
@@ -119,6 +135,9 @@ body {
 
 .top {
 	top: 0px;
+}
+.left {
+	left: 0px;
 }
 .right {
 	right: 0px;

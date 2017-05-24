@@ -5,6 +5,9 @@
     this.lengthThreshold = 4000;
   };
 
+  CookieManager.prototype.remove = function(key) {
+    this.Cookies.remove(key);
+  };
   CookieManager.prototype.set = function(key, value, expires) {
     this.Cookies.remove(key);
 
@@ -46,6 +49,9 @@
     } catch (e) {
       return undefined;
     }
+  };
+  CookieManager.prototype.getJSONGuaranteed = function(key) {
+    return this.getJSON(key) || {};
   };
 
   var splitString = function(str, length) {

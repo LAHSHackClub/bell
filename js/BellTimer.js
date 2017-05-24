@@ -26,141 +26,80 @@ var self;
       date.setMilliseconds(0);
     return date;
   };
+  var numberToStringLength = function(number, length) {
+    var numberString = number.toString();
+    for (var i = numberString.length; i < length; i++)
+      numberString = '0' + numberString;
+    return numberString;
+  };
   var dateToString = function(date) {
-    return date.getYear() + '-' + date.getMonth() + '-' + date.getDate();
+    return date.getFullYear().toString() + numberToStringLength(date.getMonth() + 1, 2) + numberToStringLength(date.getDate(), 2);
   };
 
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
+  BellTimer.prototype.getSchool = function() {
+    return this.school;
+  };
+  BellTimer.prototype.reloadSchool = function(callback) {
+    var school = window.location.hash.substring(1);
+    school = (school) ? school : self.cookieManager.getJSONGuaranteed('school').link;
+    if (!school) {
+      window.location = '/chooser';
+    } else {
+      $.get('/api/school/' + school)
+        .done(function(school) {
+          if (!school)
+            window.location = '/chooser';
+          else
+            self.cookieManager.set('school', school);
+        })
+        .always(function() {
+          var school = self.cookieManager.getJSON('school');
+          self.school = school;
+          callback(null, school);
+        });
+    }
+  };
+  var stringToTimeArray = function(str) {
+    var index = str.indexOf(':');
+    var hour = parseInt(str.substring(0, index));
+    var minute = parseInt(str.substring(index + 1));
+    return [hour, minute];
+  };
   BellTimer.prototype.reloadData = function(callback) {
     var parseData = function(data) {
-      var rawSchedules = data.schedules;
-      for (var key in rawSchedules) {
-        var schedule = rawSchedules[key];
-        for (var i = 0; i < schedule.periods.length; i++) {
-          var period = schedule.periods[i];
-          var nameSplit = period.name.split('{').map(function(a) {
-            return a.split('}');
-          }).reduce(function(a, b) {
-            return a.concat(b);
-          });
-          for (var j = 1; j < nameSplit.length; j += 2) {
-            nameSplit[j] = self.classesManager.getClasses()[parseInt(nameSplit[j])];
-          }
-          var name = nameSplit.reduce(function(a, b) {
-            return a.concat(b);
-          });
-          period.name = name;
-          if (name == 'Passing to Free') {
-            period.name = 'Free';
-          } else if (name == 'Free') {
-            schedule.periods.splice(i, 1);
-            i--;
-          }
-          if (i == 0 && name == 'Free') {
-            schedule.periods.splice(i, 1);
-            i--;
-          }
-        }
-      }
-
-      self.schedules = rawSchedules;
+      self.schedules = data.schedules;
       self.calendar = data.calendar;
 
       if (callback)
         callback();
     };
-    var parseSchedules = function(text) {
-      var outputSchedules = {};
+    var parseSchedules = function(schedules) {
+      var classes = self.classesManager.getClasses();
 
-      var lines = text.split('\n');
+      for (var key in schedules) {
+        var schedule = schedules[key];
+        var periodArray = [];
 
-      var currentScheduleName;
-      var currentSchedule;
-      for (var i in lines) {
-        var line = lines[i];
-        if (line[0] == '*') {
-          if (currentSchedule)
-            outputSchedules[currentScheduleName] = currentSchedule;
-          currentScheduleName = line.substring(2).split(' (')[0];
-          currentSchedule = {
-            displayName: line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')),
-            periods: []
-          };
-          if (line.indexOf('[') > -1)
-            currentSchedule.color = line.split('[')[1].substring(0, line.split('[')[1].indexOf(']'));
-        } else {
-          if (!line)
-            continue;
-          var time = line.substring(0, line.indexOf(' '));
-          var hour = time.split(':')[0];
-          var minute = time.split(':')[1];
-          var periodName = line.substring(line.indexOf(' ') + 1);
-
-          currentSchedule.periods.push({
-            name: periodName,
-            time: [parseInt(hour), parseInt(minute)]
+        for (var time in schedule.periods) {
+          var name = '';
+          for (var i in schedule.periods[time]) {
+            if (typeof schedule.periods[time][i] == 'string')
+              name += schedule.periods[time][i];
+            else
+              name += classes[schedule.periods[time][i]];
+          }
+          periodArray.push({
+            name: name,
+            time: stringToTimeArray(time)
           });
         }
+
+        schedule.periods = periodArray;
       }
-
-      if (currentSchedule) {
-        outputSchedules[currentScheduleName] = currentSchedule;
-      }
-
-      return outputSchedules;
-    };
-    var parseCalendar = function(text, schedules) {
-      var calendar = {
-        defaultWeek: [],
-        specialDays: {}
-      };
-
-      var lines = text.split('\n');
-
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i];
-        if (line == '* Default Week') {
-          line = lines[++i];
-          while (line && line[0] != '*') {
-            calendar.defaultWeek.push(line.substring(2));
-            line = lines[++i];
-          }
-        }
-        if (line == '* Special Days') {
-          line = lines[++i];
-
-          while (line && line[0] != '*') {
-            if (line.split(' ')[0].indexOf('-') > -1) {
-              // is a range
-              var date = new Date(line.split(' ')[0].split('-')[0]);
-              var endDate = new Date(line.split(' ')[0].split('-')[1]);
-              var scheduleName = line.split(' ')[1];
-              var schedule = {
-                scheduleName: scheduleName,
-                customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
-              };
-              while (dateToString(date) != dateToString(endDate)) {
-                calendar.specialDays[dateToString(date)] = schedule;
-                date.setDate(date.getDate() + 1);
-              }
-              calendar.specialDays[dateToString(endDate)] = schedule;
-            } else {
-              // is not a range
-              var date = new Date(line.split(' ')[0]);
-              var scheduleName = line.split(' ')[1];
-              calendar.specialDays[dateToString(date)] = {
-                scheduleName: scheduleName,
-                customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
-              };
-            }
-            line = lines[++i];
-          }
-        }
-      }
-
-      return calendar;
+      return schedules;
     };
 
     $.get('/api/version?v=' + Date.now())
@@ -171,32 +110,32 @@ var self;
           self.version = version;
       });
 
+    var getSchool = function(callback) {
+      self.reloadSchool(callback);
+    };
     var getSchedules = function(callback) {
-      $.get('/api/schedules?v=' + Date.now())
+      $.get('/api/schedules?v=' + Date.now() + '&s=' + self.getSchool().link)
         .done(function(schedules) {
           self.cookieManager.setLong('schedules', schedules);
-          var schedules = parseSchedules(schedules);
-          callback(null, schedules);
         })
-        .fail(function() {
-          var schedules = parseSchedules(self.cookieManager.getLong('schedules'));
+        .always(function() {
+          var schedules = self.cookieManager.getLongJSON('schedules');
+          schedules = parseSchedules(schedules);
           callback(null, schedules);
         });
     };
-    var getCalendar = function(schedules, callback) {
-      $.get('/api/calendar?v=' + Date.now())
+    var getCalendar = function(callback) {
+      $.get('/api/calendar?v=' + Date.now() + '&s=' + self.getSchool().link)
         .done(function(calendar) {
           self.cookieManager.setLong('calendar', calendar);
-          var calendar = parseCalendar(calendar, schedules);
-          callback(null, calendar)
         })
-        .fail(function() {
-          var calendar = parseCalendar(self.cookieManager.getLong('calendar'), schedules);
+        .always(function() {
+          var calendar = self.cookieManager.getLongJSON('calendar');
           callback(null, calendar);
         });
     };
     var getCorrection = function(callback) {
-      $.get('/api/correction?v=' + Date.now())
+      $.get('/api/correction?v=' + Date.now() + '&s=' + self.getSchool().link)
         .done(function(correction) {
           correction = parseInt(correction);
           self.bellCompensation = correction;
@@ -207,13 +146,15 @@ var self;
           callback(null, 0);
         });
     };
-    getCorrection(function(err, correction) {
-      getSchedules(function(err, schedules) {
-        getCalendar(schedules, function(err, calendar) {
-          parseData({
-            schedules: schedules,
-            calendar: calendar
-          }, callback);
+    getSchool(function(err, school) {
+      getCorrection(function(err, correction) {
+        getSchedules(function(err, schedules) {
+          getCalendar(function(err, calendar) {
+            parseData({
+              schedules: schedules,
+              calendar: calendar
+            }, callback);
+          });
         });
       });
     });
@@ -334,6 +275,7 @@ var self;
     var date = this.getDate();
     var schedule = this.getCurrentSchedule(date);
     var periods = schedule.periods;
+
     for (var i = 0; i < periods.length; i++) {
       if (periods[i].time[0] > date.getHours())
         return i - 1;
@@ -376,17 +318,33 @@ var self;
     else
       return this.getPreviousPeriod(date);
   };
+  var numberToDayName = function(i) {
+    var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return days[i];
+  };
+  var getSpecialSchedule = function(calendar, dateString) {
+    var dateNumber = parseInt(dateString);
+    var specialDays = calendar.special;
+    for (var date in specialDays) {
+      var split = date.split('-');
+      var dateStartNumber = parseInt(split[0]);
+      var dateEndNumber = parseInt(split[1] || split[0]);
+      if (dateNumber >= dateStartNumber && dateNumber <= dateEndNumber)
+        return specialDays[date];
+    }
+    return false;
+  };
   BellTimer.prototype.getCurrentSchedule = function(date) {
     if (!date) date = self.getDate();
     var dateString = dateToString(date);
-    var specialDay = self.calendar.specialDays[dateString];
+    var specialDay = getSpecialSchedule(self.calendar, dateString);
 
     var schedule;
     if (specialDay) {
-      schedule = self.schedules[specialDay.scheduleName];
-      schedule.displayName = specialDay.customName;
+      schedule = self.schedules[specialDay[0]];
+      schedule.name = specialDay[1] || schedule.name;
     } else {
-      schedule = self.schedules[self.calendar.defaultWeek[date.getDay()]];
+      schedule = self.schedules[self.calendar.default[numberToDayName(date.getDay())]];
     }
 
     for (var i in schedule.periods) {

@@ -1,0 +1,15 @@
+{
+  "default": {
+    "Sun": "weekend",
+    "Mon": "normal",
+    "Tue": "normal",
+    "Wed": "normal",
+    "Thu": "normal",
+    "Fri": "normal",
+    "Sat": "weekend"
+  },
+  "special": {
+    "20171030": ["holiday", "Halloween"],
+    "20171225-20180104": ["holiday", "Holiday Recess"]
+  }
+}

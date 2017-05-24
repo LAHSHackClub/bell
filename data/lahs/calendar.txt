@@ -6,7 +6,6 @@
 4 odd
 5 normal
 6 weekend
-
 * Special Days
 11/11/2016 holiday (Veteran's Day)
 11/23/2016 holiday (Teacher Service Day)

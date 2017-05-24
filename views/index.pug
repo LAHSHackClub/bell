@@ -9,7 +9,7 @@ html
   head
     title Bell Countdown
     link(rel="shortcut icon", type="image/png", href="/favicons/empty.png")#favicon
-    link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto")
+    link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,900")
     link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
     link(rel="stylesheet", type="text/css", href="/css/style.css?v=" + version)
     script(type="text/javascript", src="/timesync/timesync.js")
@@ -35,6 +35,9 @@ html
             td
               a.dismiss.center-vertical#dismiss(href="#")
                 i.material-icons cancel
+      .top.left.school#school
+        a.link.center-vertical#school-link(href="/search")
+          span#school-text
     .container#page2
       .centered
         span#scheduleDisplay

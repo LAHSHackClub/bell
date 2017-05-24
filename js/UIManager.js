@@ -22,6 +22,19 @@ const $ = require('jquery');
     this.classesManager = classesManager;
     this.analyticsManager = analyticsManager;
   };
+  // display school name
+  var displaySchoolName = function() {
+    var setSchoolLink = function(school) {
+      var name = school.name;
+      $('#school-link').attr('href', '/search?q=' + name);
+      $('#school-text').text(name);
+      window.location.hash = school.link;
+    };
+
+    this.bellTimer.reloadSchool(function(err, school) {
+      setSchoolLink(school);
+    });
+  };
   UIManager.prototype.initialize = function() {
     // themes
     var loadThemes = function() {
@@ -219,6 +232,7 @@ const $ = require('jquery');
     setSettingsState();
     dynamicallySetFontSize();
     slideExtension();
+    displaySchoolName();
   };
   UIManager.prototype.update = function() {
     var time = self.bellTimer.getTimeRemainingString();
@@ -235,7 +249,7 @@ const $ = require('jquery');
     $('#time').text(time);
     helpers.updateTitle(time);
     $('#subtitle').text(name);
-    $('#scheduleName').text(schedule.displayName);
+    $('#scheduleName').text(schedule.name);
     var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
     if (time.split(':').length > 2)
       min = 60;
@@ -310,6 +324,10 @@ const $ = require('jquery');
     $('.current').css('font-size', (Math.min($(window).innerHeight() * 0.05)) + 'px');
 
     $('#countdown').css('opacity', 1);
+
+    // check changed hash
+    if (window.location.hash.substring(1) != self.cookieManager.getJSON('school').link)
+      window.location.reload();
   };
   UIManager.prototype.updateGraphics = function() {
     var c = $('#circle')[0];

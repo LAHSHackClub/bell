@@ -9,7 +9,7 @@
   };
 
   IntervalManager.prototype.start = function(name) {
-    var interval = this.intervals[name];
+    var interval = self.intervals[name];
 
     clearInterval(interval.interval);
     interval.interval = null;
