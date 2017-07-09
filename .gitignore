@@ -1,3 +1,12 @@
+# Chrome app zip
+bellxt.zip
+
+# Bundle
+js/*.bundle.*
+
+# Licenses
+dependencylicenses.txt
+
 # package
 package_2.zip
 
